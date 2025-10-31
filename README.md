@@ -84,18 +84,18 @@ Servicio micro (REST) que forma parte de la plataforma Censudex y es consumido p
 
 6. **Probar endpoints**
 
-   * Swagger (dev): `http://localhost:5240/swagger`.
-   * Usar Postman con las URLs listadas en la sección Endpoints o con la colección Postman de este repositorio.
+   * Swagger (dev): `http://localhost:5003/swagger`.
+   * Usar Postman con las URLs listadas en la sección Endpoints o con la colección y variables de entorno Postman de este repositorio.
 
 ---
 
-# Endpoints (5)
+# Endpoints (6)
 
-Base URL de ejemplo local: `http://localhost:5240`
+Base URL de ejemplo local: `http://localhost:5003`
 
 1. `POST /clients` — Crear cliente
 
-   * URL: `POST http://localhost:5240/clients`
+   * URL: `POST http://localhost:5003/clients`
    * Body (JSON):
 
      ```json
@@ -114,7 +114,7 @@ Base URL de ejemplo local: `http://localhost:5240`
 
 2. `GET /clients` — Listar clientes (filtros, paginado, orden)
 
-   * URL: `GET http://localhost:5240/clients`
+   * URL: `GET http://localhost:5003/clients`
    * Query params soportados:
 
      * `fullName` (exacto o parcial, busca `FirstName + " " + LastNames`)
@@ -128,12 +128,12 @@ Base URL de ejemplo local: `http://localhost:5240`
 
 3. `GET /clients/{id}` — Obtener cliente por ID
 
-   * URL: `GET http://localhost:5240/clients/{id}`
+   * URL: `GET http://localhost:5003/clients/{id}`
    * Respuestas: `200` con `ViewUserResponse` o `404` si no existe.
 
 4. `PATCH /clients/{id}` — Actualizar cliente (replace/partial as implemented)
 
-   * URL: `PATCH http://localhost:5240/clients/{id}`
+   * URL: `PATCH http://localhost:5003/clients/{id}`
    * Body (JSON) — usa el mismo DTO que creación; password opcional.
 
      ```json
@@ -152,9 +152,35 @@ Base URL de ejemplo local: `http://localhost:5240`
 
 5. `PATCH /clients/delete/{id}` — Soft delete (desactivar)
 
-   * URL: `PATCH http://localhost:5240/clients/delete/{id}`
+   * URL: `PATCH http://localhost:5003/clients/delete/{id}`
    * Acción: `IsActive = false`.
    * Respuestas: `204 No Content`, `404` si no existe.
+
+6. `POST /clients/verify-credentials` — Verificar credenciales (email o username + password)
+
+   * URL: `POST http://localhost:5003/clients/verify-credentials`
+   * Body (JSON):
+
+     ```json
+     {
+       "email": "admin@censudex.cl",
+       "password": "Password1234!"
+     }
+     ```
+
+     O también:
+
+     ```json
+     {
+       "username": "admin",
+       "password": "Password1234!"
+     }
+     ```
+   * Respuestas:
+
+     * `200 OK` con datos básicos del cliente.
+     * `400 Bad Request` si faltan campos.
+     * `401 Unauthorized` si las credenciales son inválidas.
 
 ---
 
@@ -168,5 +194,5 @@ Base URL de ejemplo local: `http://localhost:5240`
 * `Controllers/ClientsController.cs` — endpoints REST.
 * `Mappers/ClientMapper.cs` — mapeo DTO ↔ Model.
 * `Data/Seeder.cs` — seeder runtime (solo si tabla vacía).
-
+* Colección de `Postman` y variables de entorno. 
 ---

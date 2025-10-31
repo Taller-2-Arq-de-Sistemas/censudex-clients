@@ -117,11 +117,11 @@ Base URL de ejemplo local: `http://localhost:5240`
    * URL: `GET http://localhost:5240/clients`
    * Query params soportados:
 
-     * `name` (full o parcial, busca `FirstName + " " + LastNames`)
-     * `email` (exact)
+     * `fullName` (exacto o parcial, busca `FirstName + " " + LastNames`)
+     * `email` (exacto)
      * `username` (parcial)
      * `isActive` (true/false)
-     * `sortBy` (FirstName, LastNames, Email, Username, CreatedAt)
+     * `sortBy` (FirstName, LastNames, Email, Username o CreatedAt)
      * `isDescending` (true/false)
      * `pageNumber`, `pageSize`
    * Respuesta: objeto con `Items`, `TotalCount`, `TotalPages`.

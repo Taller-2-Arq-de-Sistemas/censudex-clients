@@ -1,4 +1,4 @@
-@censudex_clients_service_HostAddress = http://localhost:5240
+@censudex_clients_service_HostAddress = http://localhost:5003
 
 GET {{censudex_clients_service_HostAddress}}/weatherforecast/
 Accept: application/json

@@ -4,6 +4,7 @@ using censudex_clients_service.src.Helpers.Requests;
 using censudex_clients_service.src.Mappers;
 using censudex_clients_service.src.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using BCrypt.Net;
 
 namespace censudex_clients_service.src.Controllers
 {
@@ -137,6 +138,46 @@ namespace censudex_clients_service.src.Controllers
 
             await _repository.SoftDeleteAsync(id);
             return NoContent();
+        }
+
+
+        [HttpPost("credentials")]
+        public async Task<IActionResult> VerifyCredentials([FromBody] VerifyCredentialsRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.Username))
+                return BadRequest("Debe proporcionar un correo electrónico o un nombre de usuario.");
+
+            if (string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest("La contraseña es obligatoria.");
+
+            // Buscar cliente por email o username
+            var client = !string.IsNullOrWhiteSpace(request.Email)
+                ? await _repository.GetByEmailAsync(request.Email)
+                : await _repository.GetByUsernameAsync(request.Username!);
+
+            if (client == null)
+                return Unauthorized("Credenciales inválidas.");
+
+            // Validar que la cuenta no ha sido eliminada
+            bool disabled = client.IsActive == false;
+            if (disabled)
+                return Unauthorized("La cuenta que está intentando acceder ha sido desactivada.");
+
+            // Validar contraseña (comparación segura con hash)
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, client.PasswordHash);
+            if (!isPasswordValid)
+                return Unauthorized("Credenciales inválidas.");
+
+            // Opcional: devolver datos básicos del cliente
+            var response = new
+            {
+                client.Id,
+                client.Username,
+                client.Email,
+                client.IsActive
+            };
+
+            return Ok(response);
         }
     }
 }

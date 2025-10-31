@@ -1,11 +1,50 @@
 
 using censudex_clients_service.src.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace censudex_clients_service.src.Data
-{ 
+{
+    
+    /// <summary>
+    /// Provides database seeding functionality for initial application data.
+    /// </summary>
+    /// <remarks>
+    /// This static class contains methods to populate the database with initial
+    /// test data and default users for development and demonstration purposes.
+    /// </remarks>
     public static class Seeder
     {
+        
+        /// <summary>
+        /// Seeds the database with initial client data including admin and test users.
+        /// </summary>
+        /// <param name="db">The database context to seed with data.</param>
+        /// <remarks>
+        /// <para>
+        /// This method creates the following test users:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>Admin user (Role 1) with credentials: admin@censudex.cl / Password1234!</description>
+        /// </item>
+        /// <item>
+        /// <description>Regular users (Role 0) with test data and password: Password1234!</description>
+        /// </item>
+        /// </list>
+        /// <para>
+        /// All passwords are securely hashed using BCrypt before storage.
+        /// </para>
+        /// <example>
+        /// The following example shows how to use the Seed method:
+        /// <code>
+        /// using (var context = new ApplicationDBContext(options))
+        /// {
+        ///     Seeder.Seed(context);
+        /// }
+        /// </code>
+        /// </example>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">Thrown when the db parameter is null.</exception>
+        /// <exception cref="DbUpdateException">Thrown when there is an error saving changes to the database.</exception>
         public static void Seed(ApplicationDBContext db)
         {
             var passwordAdminHash = BCrypt.Net.BCrypt.HashPassword("Password1234!");

@@ -5,8 +5,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace censudex_clients_service.src.Data.Configurations
 {
+    /// <summary>
+    /// Configures the entity framework mappings for the <see cref="Client"/> entity.
+    /// </summary>
     public class ClientConfiguration : IEntityTypeConfiguration<Client>
     {
+        /// <summary>
+        /// Configures the database schema for the <see cref="Client"/> entity.
+        /// </summary>
+        /// <param name="builder">The builder used to configure the entity type.</param>
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             builder.ToTable("clients");
@@ -23,7 +30,6 @@ namespace censudex_clients_service.src.Data.Configurations
 
             builder.Property(c => c.CreatedAt)
                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
         }
     }
 }

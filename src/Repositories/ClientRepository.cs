@@ -23,10 +23,10 @@ namespace censudex_clients_service.src.Repositories
         {
             var clientsQuery = _context.Clients.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(query.Name))
+            if (!string.IsNullOrWhiteSpace(query.FullName))
             {
                 clientsQuery = clientsQuery.Where(c =>
-                    (c.FirstName + " " + c.LastNames).Contains(query.Name));
+                    (c.FirstName + " " + c.LastNames).Contains(query.FullName));
             }
 
             if (!string.IsNullOrWhiteSpace(query.Email))

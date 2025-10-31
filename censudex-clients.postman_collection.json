@@ -54,7 +54,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{clients_baseurl}}/clients?fullName=Alice&isActive=true",
+							"raw": "{{clients_baseurl}}/clients?isActive=false&username=alice",
 							"host": [
 								"{{clients_baseurl}}"
 							],
@@ -64,11 +64,21 @@
 							"query": [
 								{
 									"key": "fullName",
-									"value": "Alice"
+									"value": "Alice",
+									"disabled": true
 								},
 								{
 									"key": "isActive",
-									"value": "true"
+									"value": "false"
+								},
+								{
+									"key": "username",
+									"value": "alice"
+								},
+								{
+									"key": "email",
+									"value": "aliceupdated@censudex.cl",
+									"disabled": true
 								}
 							]
 						}
@@ -134,6 +144,33 @@
 								"clients",
 								"delete",
 								"0256854b-0bb2-425f-9440-58aad23b0edb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Credentials",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@censudex.cl\",\r\n  \"password\": \"Password1234!\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{clients_baseurl}}/clients/credentials",
+							"host": [
+								"{{clients_baseurl}}"
+							],
+							"path": [
+								"clients",
+								"credentials"
 							]
 						}
 					},

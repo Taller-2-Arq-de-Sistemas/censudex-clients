@@ -156,9 +156,9 @@ Base URL de ejemplo local: `http://localhost:5003`
    * Acción: `IsActive = false`.
    * Respuestas: `204 No Content`, `404` si no existe.
 
-6. `POST /clients/verify-credentials` — Verificar credenciales (email o username + password)
+6. `POST /clients/credentials` — Verificar credenciales (email o username + password)
 
-   * URL: `POST http://localhost:5003/clients/verify-credentials`
+   * URL: `POST http://localhost:5003/clients/credentials`
    * Body (JSON):
 
      ```json

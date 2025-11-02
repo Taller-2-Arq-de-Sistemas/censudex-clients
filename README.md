@@ -59,10 +59,11 @@ Por defecto este servicio funciona en el puerto 5003.
    cp .env.example .env
    ```
 
-   Luego edita `.env` y utiliza tu connection_string de tu base de datos en el formato a continuación.
+   Luego edita `.env` y utiliza tu connection_string de tu base de datos y la url para el servicio de autenticación (se recomienda usar [este](https://github.com/Taller-2-Arq-de-Sistemas/censudex-auth) repositorio ) en el formato a continuación.
 
    ```
    DB_CONNECTION_STRING=Host="yourdbhost";Database="yourdbname";Username="yourdbusername";Password="yourdbpassword";Port="yourdbport";
+   AUTH_SERVICE_URL=your_auth_service_url
    ```
 
 3. **Instala herramientas .NET Entity Framework**

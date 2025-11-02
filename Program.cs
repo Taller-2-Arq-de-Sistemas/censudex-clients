@@ -1,3 +1,4 @@
+
 using DotNetEnv;
 using censudex_clients_service.src.Data;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,11 @@ builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseNpgsql
 /// Registers the client repository for dependency injection.
 /// </summary>
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+
+/// <summary>
+/// Registers the auth service for dependency injection.
+/// </summary>
+builder.Services.AddAuthServiceClient();
 
 /// <summary>
 /// Adds controllers for handling HTTP API requests.

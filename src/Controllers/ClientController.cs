@@ -172,6 +172,7 @@ namespace censudex_clients_service.src.Controllers
             var response = new
             {
                 client.Id,
+                client.Role,
                 client.Username,
                 client.Email,
                 client.IsActive

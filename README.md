@@ -2,6 +2,8 @@
 
 Servicio micro (REST) que forma parte de la plataforma Censudex y es consumido por la [**API Gateway**](https://github.com/Taller-2-Arq-de-Sistemas/censudex-api-gateway) y otros servicios (ej. [Auth](https://github.com/Taller-2-Arq-de-Sistemas/censudex-auth) y [Órdenes](https://github.com/Taller-2-Arq-de-Sistemas/censudex-orders)). Gestiona el CRUD básico de clientes: creación, lectura, actualización y desactivación (soft delete). Está implementado en **C# (.NET 9)** con **EF Core + Npgsql (PostgreSQL)** y sigue una separación sencilla tipo *Clean-ish* (Controllers → Services/Repositories → Data/EF).
 
+Por defecto este servicio funciona en el puerto 5003.
+
 ---
 
 # Arquitectura y patrones

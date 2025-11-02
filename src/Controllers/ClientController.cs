@@ -141,6 +141,15 @@ namespace censudex_clients_service.src.Controllers
         }
 
 
+        /// <summary>
+        /// Verifies existence of credentials.
+        /// </summary>
+        /// <param name="request">The login request from an auth service.</param>
+        /// <returns>
+        /// Returns 400 If neither email nor username is provided.
+        /// Returns 401 If credentials are invalid or account is disabled.
+        /// Returns 200 OK with basic client info on successful verification.
+        /// </returns>
         [HttpPost("credentials")]
         public async Task<IActionResult> VerifyCredentials([FromBody] VerifyCredentialsRequest request)
         {

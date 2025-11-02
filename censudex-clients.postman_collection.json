@@ -54,7 +54,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{clients_baseurl}}/clients?isActive=false&username=alice",
+							"raw": "{{clients_baseurl}}/clients",
 							"host": [
 								"{{clients_baseurl}}"
 							],
@@ -69,11 +69,13 @@
 								},
 								{
 									"key": "isActive",
-									"value": "false"
+									"value": "false",
+									"disabled": true
 								},
 								{
 									"key": "username",
-									"value": "alice"
+									"value": "alice",
+									"disabled": true
 								},
 								{
 									"key": "email",
@@ -91,13 +93,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{clients_baseurl}}/clients/0256854b-0bb2-425f-9440-58aad23b0edb",
+							"raw": "{{clients_baseurl}}/clients/ea3f707f-bb11-4fd3-8ddc-0166d52992f4",
 							"host": [
 								"{{clients_baseurl}}"
 							],
 							"path": [
 								"clients",
-								"0256854b-0bb2-425f-9440-58aad23b0edb"
+								"ea3f707f-bb11-4fd3-8ddc-0166d52992f4"
 							]
 						}
 					},
@@ -133,8 +135,24 @@
 				{
 					"name": "Delete",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjExMTExMTExLTExMTEtMTExMS0xMTExLTExMTExMTExMTExMSIsIlJvbGUiOiIxIiwianRpIjoiYTRmOGMxZTUtYTMzMS00ODUxLWJmNTItYTYzNGViYmY2ZDAyIiwiZXhwIjoxNzYyMDY1NjI4fQ.CTJmRm6drwgIu_AquKP2FNpbmbLBj3mqs0TJwYVJiuk",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{clients_baseurl}}/clients/delete/0256854b-0bb2-425f-9440-58aad23b0edb",
 							"host": [

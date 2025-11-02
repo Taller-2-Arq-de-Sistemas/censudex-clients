@@ -4,7 +4,7 @@ using censudex_clients_service.src.Helpers.Requests;
 using censudex_clients_service.src.Mappers;
 using censudex_clients_service.src.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using BCrypt.Net;
+using censudex_clients_service.src.Services;
 
 namespace censudex_clients_service.src.Controllers
 {
@@ -16,14 +16,16 @@ namespace censudex_clients_service.src.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _repository;
+        private readonly IVerifyToken _tokenVerifier;
 
         /// <summary>
         /// Initializes a new instance of the ClientController class.
         /// </summary>
         /// <param name="repository">The client repository for data access operations.</param>
-        public ClientController(IClientRepository repository)
+        public ClientController(IClientRepository repository, IVerifyToken tokenVerifier)
         {
             _repository = repository;
+            _tokenVerifier = tokenVerifier;
         }
 
         /// <summary>
@@ -123,15 +125,31 @@ namespace censudex_clients_service.src.Controllers
 
         /// <summary>
         /// Performs a soft delete of a client by marking them as inactive.
+        /// Requires a valid JWT token and role 1 authorization.
         /// </summary>
         /// <param name="id">The GUID of the client to soft delete.</param>
+        /// <param name="authHeader">The Authorization header containing the Bearer token.</param>
         /// <returns>
         /// Returns 204 No Content on successful soft delete.
+        /// Returns 401 Unauthorized if the token is invalid or missing.
+        /// Returns 403 Forbidden if the token does not belong to an authorized role.
         /// Returns 404 Not Found if the client does not exist.
         /// </returns>
         [HttpPatch("delete/{id:guid}")]
-        public async Task<ActionResult> SoftDelete(Guid id)
+        public async Task<ActionResult> SoftDelete(Guid id, [FromHeader(Name = "Authorization")] string authHeader)
         {
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                return Unauthorized("Debe proporcionar un token válido.");
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            var validated = await _tokenVerifier.VerifyTokenAsync(token);
+
+            if (validated == null)
+                return Unauthorized("Token inválido o expirado.");
+
+            if (validated.Role != "1")
+                return Forbid("No tiene permisos para realizar esta acción.");
+
             var client = await _repository.GetByIdAsync(id);
             if (client == null)
                 return NotFound();

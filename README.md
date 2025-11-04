@@ -43,6 +43,7 @@ Por defecto este servicio funciona en el puerto 5003.
 ---
 
 # Pasos para ejecutar el proyecto (develop)
+>**Este servicio no fue hecho para utilizarse individualmente, endpoints que necesitan verificación (como /delete) no funcionarán correctamente, para una guía de levantamiento completo consulta la [API Gateway](https://github.com/Taller-2-Arq-de-Sistemas/censudex-api-gateway/?tab=readme-ov-file#ejecución-del-proyecto).**
 
 > **Copia y pega** los comandos en tu terminal (desde la raíz del proyecto).
 
@@ -53,7 +54,7 @@ Por defecto este servicio funciona en el puerto 5003.
    cd censudex-clients
    ```
 
-2. **Copiar ejemplo de .env**
+2. **Copiar ejemplo de .env y agregar tus variables de entorno**
 
    ```bash
    cp .env.example .env

@@ -4,6 +4,7 @@ using censudex_clients_service.src.Data;
 using Microsoft.EntityFrameworkCore;
 using censudex_clients_service.src.Repositories;
 using censudex_clients_service.src.Extensions;
+using censudex_clients_service.src.GrpcServices;
 
 // Load environment variables from .env file
 Env.Load();
@@ -57,7 +58,8 @@ builder.Services.AddSwaggerGen();
 // Build the application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+app.MapGrpcService<ClientsGrpcService>();
+app.MapGet("/", () => "This service only supports gRPC.");
 
 /// <summary>
 /// Enables Swagger middleware in development environment for API documentation and testing.

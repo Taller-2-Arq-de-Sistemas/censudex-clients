@@ -23,6 +23,7 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"
 /// </remarks>
 var builder = WebApplication.CreateBuilder(args);
 
+builder.EnablegRPC();
 // Add services to the dependency injection container
 builder.Services.AddGrpc();
 

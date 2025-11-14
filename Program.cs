@@ -24,6 +24,7 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the dependency injection container
+builder.Services.AddGrpc();
 
 /// <summary>
 /// Configures the Entity Framework DbContext with PostgreSQL provider.

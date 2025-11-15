@@ -20,9 +20,9 @@ namespace censudex_clients_service.src.Extensions
         {
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ConfigureEndpointDefaults(listenOptions =>
+                options.ListenAnyIP(5003, listenOptions =>
                 {
-                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                    listenOptions.Protocols = HttpProtocols.Http2;
                 });
             });
 
@@ -50,7 +50,7 @@ namespace censudex_clients_service.src.Extensions
 
             return services;
         }
- 
- 
+
+
     }
 }

@@ -3,16 +3,19 @@ using censudex_clients_service.src.Repositories;
 using censudex_clients_service.src.Protos.Clients;
 using censudex_clients_service.src.Mappers;
 using censudex_clients_service.src.Models;
+using censudex_clients_service.src.Services;
 
 namespace censudex_clients_service.src.GrpcServices
 {
     public class ClientsGrpcService : ClientsService.ClientsServiceBase
     {
         private readonly IClientRepository _repository;
+        private readonly IVerifyToken _tokenVerifier;
 
-        public ClientsGrpcService(IClientRepository repository)
+        public ClientsGrpcService(IClientRepository repository, IVerifyToken tokenVerifier)
         {
             _repository = repository;
+            _tokenVerifier = tokenVerifier;
         }
 
         // -----------------------------------------------------------
@@ -107,23 +110,47 @@ namespace censudex_clients_service.src.GrpcServices
         // SOFT DELETE
         // -----------------------------------------------------------
         public override async Task<SoftDeleteResponseProto> SoftDelete(
-            SoftDeleteRequestProto request,
-            ServerCallContext context)
+     SoftDeleteRequestProto request,
+     ServerCallContext context)
         {
-            if (string.IsNullOrEmpty(request.Token))
+            // 1. Ensure token exists
+            if (string.IsNullOrWhiteSpace(request.Token))
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Token required"));
 
-            if (!Guid.TryParse(request.Id, out var guid))
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID format"));
+            // 2. Token must start with Bearer (just like REST)
+            if (!request.Token.StartsWith("Bearer "))
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid token format"));
 
+            var jwt = request.Token.Substring("Bearer ".Length).Trim();
+
+            // 3. Validate token through Auth Service (same as REST)
+            var validated = await _tokenVerifier.VerifyTokenAsync(jwt);
+            if (validated == null)
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid or expired token"));
+
+            // 4. Check role (must be "1")
+            if (validated.Role != "1")
+                throw new RpcException(new Status(StatusCode.PermissionDenied, "Insufficient permissions"));
+
+            // 5. Validate GUID
+            if (!Guid.TryParse(request.Id, out var guid))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID"));
+
+            // 6. Verify client exists
             var client = await _repository.GetByIdAsync(guid);
             if (client == null)
                 throw new RpcException(new Status(StatusCode.NotFound, "Client not found"));
 
+            // 7. Perform soft delete
             await _repository.SoftDeleteAsync(guid);
 
-            return new SoftDeleteResponseProto { Success = true };
+            // 204 -> Success = true
+            return new SoftDeleteResponseProto
+            {
+                Success = true
+            };
         }
+
 
         // -----------------------------------------------------------
         // VERIFY CREDENTIALS

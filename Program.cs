@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using censudex_clients_service.src.Repositories;
 using censudex_clients_service.src.Extensions;
 using censudex_clients_service.src.GrpcServices;
+using censudex_clients_service.src.Services;
 
 // Load environment variables from .env file
 Env.Load();
@@ -30,12 +31,14 @@ builder.Services.AddGrpc();
 /// <summary>
 /// Configures the Entity Framework DbContext with PostgreSQL provider.
 /// </summary>
-builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseNpgsql(connectionString)); 
+builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseNpgsql(connectionString));
 
 /// <summary>
 /// Registers the client repository for dependency injection.
 /// </summary>
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IVerifyToken, VerifyToken>();
+
 
 /// <summary>
 /// Registers the auth service for dependency injection.

@@ -206,6 +206,21 @@ namespace censudex_clients_service.src.GrpcServices
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Username excede el máximo de 50 caracteres"));
 
 
+            // Check email uniqueness (but ignore current user)
+            if (await _repository.ExistsByEmailAsync(request.Email))
+            {
+                throw new RpcException(
+                    new Status(StatusCode.AlreadyExists, "Email already exists")
+                );
+            }
+
+            // Check username uniqueness (but ignore current user)
+            if (await _repository.ExistsByUsernameAsync(request.Username))
+            {
+                throw new RpcException(
+                    new Status(StatusCode.AlreadyExists, "Username already exists")
+                );
+            }
             // PhoneNumber (optional but must match pattern if present)
             if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
             {

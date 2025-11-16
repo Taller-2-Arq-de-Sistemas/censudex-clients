@@ -41,6 +41,60 @@ namespace censudex_clients_service.src.GrpcServices
                 string errors = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
                 throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
             }
+
+            // FirstName
+            if (string.IsNullOrWhiteSpace(request.FirstName))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "FirstName es requerido"));
+
+            if (request.FirstName.Length > 100)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "FirstName excede el máximo de 100 caracteres"));
+
+            // LastName
+            if (string.IsNullOrWhiteSpace(request.LastName))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "LastName es requerido"));
+
+            if (request.LastName.Length > 100)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "LastName excede el máximo de 100 caracteres"));
+
+            // Email
+            if (string.IsNullOrWhiteSpace(request.Email))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Email es requerido"));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Email, @"^[^@]+@[^@]+\.[^@]+$"))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Formato de Email inválido"));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Email, @"^[^@]+@censudex\.cl$"))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Email debe pertenecer a @censudex.cl"));
+
+            // Username
+            if (string.IsNullOrWhiteSpace(request.Username))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username es requerido"));
+
+            if (request.Username.Length < 4)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username debe tener al menos 4 caracteres"));
+
+            if (request.Username.Length > 50)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username excede el máximo de 50 caracteres"));
+
+            // PhoneNumber (optional)
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(request.PhoneNumber, @"^\+56[2-9]\d{8}$"))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument,
+                        "Número telefónico no válido. Formato esperado: +56911223344"));
+            }
+
+            // Password
+            if (string.IsNullOrWhiteSpace(request.Password))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Password es requerido"));
+
+            if (request.Password.Length < 8)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Password debe tener mínimo 8 caracteres"));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).+$"))
+                throw new RpcException(new Status(StatusCode.InvalidArgument,
+                    "La contraseña debe incluir mayúscula, minúscula, número y carácter especial"));
+
             // Email uniqueness validation
             if (await _repository.ExistsByEmailAsync(request.Email))
                 throw new RpcException(new Status(StatusCode.AlreadyExists, "Email already exists"));
@@ -114,6 +168,51 @@ namespace censudex_clients_service.src.GrpcServices
                 string errors = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
                 throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
             }
+            // FirstName (required)
+            if (string.IsNullOrWhiteSpace(request.FirstName))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "FirstName es requerido"));
+
+            if (request.FirstName.Length > 100)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "FirstName excede el máximo de 100 caracteres"));
+
+
+            // LastName (required)
+            if (string.IsNullOrWhiteSpace(request.LastName))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "LastName es requerido"));
+
+            if (request.LastName.Length > 100)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "LastName excede el máximo de 100 caracteres"));
+
+
+            // Email (required)
+            if (string.IsNullOrWhiteSpace(request.Email))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Email es requerido"));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Email, @"^[^@]+@[^@]+\.[^@]+$"))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Formato de Email inválido"));
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Email, @"^[^@]+@censudex\.cl$"))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Email debe pertenecer a @censudex.cl"));
+
+
+            // Username (required)
+            if (string.IsNullOrWhiteSpace(request.Username))
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username es requerido"));
+
+            if (request.Username.Length < 4)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username debe tener al menos 4 caracteres"));
+
+            if (request.Username.Length > 50)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Username excede el máximo de 50 caracteres"));
+
+
+            // PhoneNumber (optional but must match pattern if present)
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(request.PhoneNumber, @"^\+56[2-9]\d{8}$"))
+                    throw new RpcException(new Status(StatusCode.InvalidArgument,
+                        "Número telefónico no válido. Formato esperado: +56911223344"));
+            }
             if (!Guid.TryParse(request.Id, out var guid))
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID format"));
 
@@ -133,8 +232,8 @@ namespace censudex_clients_service.src.GrpcServices
         // SOFT DELETE
         // -----------------------------------------------------------
         public override async Task<SoftDeleteResponseProto> SoftDelete(
-     SoftDeleteRequestProto request,
-     ServerCallContext context)
+            SoftDeleteRequestProto request,
+            ServerCallContext context)
         {
             // 1. Ensure token exists
             if (string.IsNullOrWhiteSpace(request.Token))

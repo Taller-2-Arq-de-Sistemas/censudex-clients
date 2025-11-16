@@ -255,10 +255,11 @@ namespace censudex_clients_service.src.GrpcServices
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Token required"));
 
             // 2. Token must start with Bearer (just like REST)
-            if (!request.Token.StartsWith("Bearer "))
-                throw new RpcException(new Status(StatusCode.Unauthenticated, "Invalid token format"));
+            var jwt = request.Token;
 
-            var jwt = request.Token.Substring("Bearer ".Length).Trim();
+            if (jwt.StartsWith("Bearer "))
+                jwt = jwt.Substring("Bearer ".Length).Trim();
+
 
             // 3. Validate token through Auth Service (same as REST)
             var validated = await _tokenVerifier.VerifyTokenAsync(jwt);

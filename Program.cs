@@ -6,6 +6,9 @@ using censudex_clients_service.src.Repositories;
 using censudex_clients_service.src.Extensions;
 using censudex_clients_service.src.GrpcServices;
 using censudex_clients_service.src.Services;
+using censudex_clients_service.src.Validator;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 // Load environment variables from .env file
 Env.Load();
@@ -23,6 +26,8 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"
 /// retrieval, updating, and soft deletion with proper validation and security.
 /// </remarks>
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.EnablegRPC();
 // Add services to the dependency injection container

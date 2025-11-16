@@ -4,6 +4,7 @@ using censudex_clients_service.src.Protos.Clients;
 using censudex_clients_service.src.Mappers;
 using censudex_clients_service.src.Models;
 using censudex_clients_service.src.Services;
+using FluentValidation;
 
 namespace censudex_clients_service.src.GrpcServices
 {
@@ -11,11 +12,19 @@ namespace censudex_clients_service.src.GrpcServices
     {
         private readonly IClientRepository _repository;
         private readonly IVerifyToken _tokenVerifier;
+        private readonly IValidator<CreateUserRequestProto> _createValidator;
+        private readonly IValidator<UpdateUserRequestProto> _updateValidator;
 
-        public ClientsGrpcService(IClientRepository repository, IVerifyToken tokenVerifier)
+        public ClientsGrpcService(IClientRepository repository,
+                                    IVerifyToken tokenVerifier,
+                                    IValidator<CreateUserRequestProto> createValidator,
+                                    IValidator<UpdateUserRequestProto> updateValidator)
+
         {
             _repository = repository;
             _tokenVerifier = tokenVerifier;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         // -----------------------------------------------------------
@@ -25,6 +34,13 @@ namespace censudex_clients_service.src.GrpcServices
             CreateUserRequestProto request,
             ServerCallContext context)
         {
+            var validation = await _createValidator.ValidateAsync(request);
+
+            if (!validation.IsValid)
+            {
+                string errors = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
+            }
             // Email uniqueness validation
             if (await _repository.ExistsByEmailAsync(request.Email))
                 throw new RpcException(new Status(StatusCode.AlreadyExists, "Email already exists"));
@@ -91,6 +107,13 @@ namespace censudex_clients_service.src.GrpcServices
             UpdateUserRequestProto request,
             ServerCallContext context)
         {
+            var validation = await _updateValidator.ValidateAsync(request);
+
+            if (!validation.IsValid)
+            {
+                string errors = string.Join("; ", validation.Errors.Select(e => e.ErrorMessage));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, errors));
+            }
             if (!Guid.TryParse(request.Id, out var guid))
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID format"));
 

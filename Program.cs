@@ -29,6 +29,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
+builder.Services.AddRabbitMqWithMassTransit(builder.Configuration);
+
 builder.EnablegRPC();
 // Add services to the dependency injection container
 builder.Services.AddGrpc();

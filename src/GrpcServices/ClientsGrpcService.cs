@@ -5,6 +5,8 @@ using censudex_clients_service.src.Mappers;
 using censudex_clients_service.src.Models;
 using censudex_clients_service.src.Services;
 using FluentValidation;
+using MassTransit;
+using censudex_clients_service.src.Shared.Events.Clients;
 
 namespace censudex_clients_service.src.GrpcServices
 {
@@ -14,17 +16,20 @@ namespace censudex_clients_service.src.GrpcServices
         private readonly IVerifyToken _tokenVerifier;
         private readonly IValidator<CreateUserRequestProto> _createValidator;
         private readonly IValidator<UpdateUserRequestProto> _updateValidator;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public ClientsGrpcService(IClientRepository repository,
-                                    IVerifyToken tokenVerifier,
-                                    IValidator<CreateUserRequestProto> createValidator,
-                                    IValidator<UpdateUserRequestProto> updateValidator)
+            IVerifyToken tokenVerifier,
+            IValidator<CreateUserRequestProto> createValidator,
+            IValidator<UpdateUserRequestProto> updateValidator,
+            IPublishEndpoint publishEndpoint)
 
         {
             _repository = repository;
             _tokenVerifier = tokenVerifier;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _publishEndpoint = publishEndpoint;
         }
 
         // -----------------------------------------------------------
@@ -107,7 +112,16 @@ namespace censudex_clients_service.src.GrpcServices
             var client = ProtoMapper.FromCreateUserProto(request);
 
             var created = await _repository.CreateAsync(client);
-
+            // ---- Publish event ----
+            await _publishEndpoint.Publish(new ClientCreatedEvent
+            {
+                Id = created.Id.ToString(),
+                Email = created.Email,
+                Username = created.Username,
+                FullName = $"{created.FirstName} {created.LastNames}",
+                PhoneNumber = created.PhoneNumber,
+                CreatedAt = DateTime.UtcNow
+            }, context => context.SetRoutingKey("censudex.clients.created"));
             // Convert domain → proto
             return ProtoMapper.ToViewUserResponseProto(created);
         }
@@ -234,7 +248,16 @@ namespace censudex_clients_service.src.GrpcServices
             var client = await _repository.GetByIdAsync(guid);
             if (client == null)
                 throw new RpcException(new Status(StatusCode.NotFound, "Client not found"));
-
+            // ---- Publish Update Event ----
+            await _publishEndpoint.Publish(new ClientUpdatedEvent
+            {
+                Id = client.Id.ToString(),
+                Email = client.Email,
+                Username = client.Username,
+                FullName = $"{client.FirstName} {client.LastNames}",
+                PhoneNumber = client.PhoneNumber,
+                UpdatedAt = DateTime.UtcNow
+            }, context => context.SetRoutingKey("censudex.clients.updated"));
             // Proto → domain update
             ProtoMapper.UpdateClientFromProto(client, request);
 
@@ -281,7 +304,12 @@ namespace censudex_clients_service.src.GrpcServices
 
             // 7. Perform soft delete
             await _repository.SoftDeleteAsync(guid);
-
+            // ---- Publish Delete Event ----
+            await _publishEndpoint.Publish(new ClientDeletedEvent
+            {
+                Id = client.Id.ToString(),
+                DeletedAt = DateTime.UtcNow
+            }, context => context.SetRoutingKey("censudex.clients.deleted"));
             // 204 -> Success = true
             return new SoftDeleteResponseProto
             {
